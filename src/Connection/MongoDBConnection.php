@@ -118,9 +118,11 @@ class MongoDBConnection implements MongoDBConnectionInterface
     public function getDatabase(): Database
     {
         if ($this->database === null) {
+            /** @var array{typeMap: array<string, string>} $options */
+            $options = ['typeMap' => $this->typeMap];
             $this->database = $this->getClient()->selectDatabase(
                 $this->getDatabaseName(),
-                ['typeMap' => $this->typeMap]
+                $options
             );
         }
 
@@ -132,9 +134,10 @@ class MongoDBConnection implements MongoDBConnectionInterface
      */
     public function collection(string $name): Collection
     {
-        return $this->getDatabase()->selectCollection($name, [
-            'typeMap' => $this->typeMap,
-        ]);
+        /** @var array{typeMap: array<string, string>} $options */
+        $options = ['typeMap' => $this->typeMap];
+
+        return $this->getDatabase()->selectCollection($name, $options);
     }
 
     /**
