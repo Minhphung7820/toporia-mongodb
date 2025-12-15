@@ -1030,7 +1030,7 @@ class MongoDBQueryBuilder
      */
     public function aggregate(): AggregationPipeline
     {
-        return new AggregationPipeline($this->getCollection());
+        return new AggregationPipeline($this->getCollection(), $this->connection);
     }
 
     /**

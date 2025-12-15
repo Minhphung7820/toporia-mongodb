@@ -6,9 +6,9 @@ namespace Toporia\MongoDB\Query;
 
 use MongoDB\Collection;
 use MongoDB\Driver\Cursor;
-use MongoDB\BSON\ObjectId;
 use InvalidArgumentException;
 use Closure;
+use Toporia\MongoDB\Contracts\MongoDBConnectionInterface;
 
 /**
  * Fluent builder for MongoDB aggregation pipelines.
@@ -35,6 +35,11 @@ class AggregationPipeline
     protected Collection $collection;
 
     /**
+     * The MongoDB connection instance.
+     */
+    protected MongoDBConnectionInterface $connection;
+
+    /**
      * The aggregation pipeline stages.
      *
      * @var array<int, array<string, mixed>>
@@ -51,9 +56,10 @@ class AggregationPipeline
     /**
      * Create a new aggregation pipeline instance.
      */
-    public function __construct(Collection $collection)
+    public function __construct(Collection $collection, MongoDBConnectionInterface $connection)
     {
         $this->collection = $collection;
+        $this->connection = $connection;
     }
 
     /**
@@ -70,7 +76,8 @@ class AggregationPipeline
     public function match(array|Closure $conditions): static
     {
         if ($conditions instanceof Closure) {
-            $builder = new MongoDBQueryBuilder($this->collection);
+            $collectionName = $this->collection->getCollectionName();
+            $builder = new MongoDBQueryBuilder($this->connection, $collectionName);
             $conditions($builder);
             $conditions = $builder->compileWheres();
         }
@@ -955,7 +962,7 @@ class AggregationPipeline
      */
     public function clone(): static
     {
-        $clone = new static($this->collection);
+        $clone = new static($this->collection, $this->connection);
         $clone->pipeline = $this->pipeline;
         $clone->options = $this->options;
 
