@@ -679,7 +679,7 @@ abstract class MongoDBModel implements MongoDBModelInterface, JsonSerializable
      */
     public static function aggregate(): AggregationPipeline
     {
-        return new AggregationPipeline(static::getMongoCollection());
+        return new AggregationPipeline(static::getMongoCollection(), static::getConnectionResolver());
     }
 
     /**
